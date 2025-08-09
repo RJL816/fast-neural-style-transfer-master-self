@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>艺术风格转换器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .control-panel {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            background: #eef1ff;
+            border-color: #764ba2;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .model-selection {
+            margin-bottom: 25px;
+        }
+
+        .selection-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #modelSelect {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        #modelSelect:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .download-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #20bf6b 0%, #01baef 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .preview-panel {
+            flex: 2;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .image-box {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-label {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .image-placeholder {
+            flex: 1;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background: #f8f9ff;
+        }
+
+        .image-placeholder-text {
+            color: #999;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+        }
+
+        #output {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #667eea;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .model-previews {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .model-preview {
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .model-preview:hover {
+            background: #eef1ff;
+            transform: translateY(-3px);
+        }
+
+        .model-preview.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .model-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-palette"></i> 艺术风格转换器</h1>
+            <p class="subtitle">将您的图片转换为世界名画风格</p>
+        </header>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <h2 class="panel-title">操作面板</h2>
+
+                <div class="upload-area" id="dropArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <p class="upload-text">点击选择图片或拖拽图片到此处</p>
+                    <button class="upload-btn" id="selectBtn">
+                        <i class="fas fa-folder-open"></i> 选择图片
+                    </button>
+                    <input type="file" id="fileInput" name="image" accept="image/*" required>
+                </div>
+
+                <div class="model-selection">
+                    <label class="selection-label" for="modelSelect">
+                        <i class="fas fa-magic"></i> 选择艺术风格
+                    </label>
+                    <select name="model" id="modelSelect">
+                        <option value="candy">🍬 糖果风格</option>
+                        <option value="mosaic">🎨 马赛克艺术</option>
+                        <option value="rain-princess">👸 雨中公主</option>
+                        <option value="udnie">🦋 乌德尼</option>
+                        <option value="starry_night">✨ 梵高星空</option>
+                        <option value="oil_style">🎨 油画风格</option>
+                        <option value="oil_style01">🖼️ 经典油画</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn" id="predictBtn">
+                    <i class="fas fa-bolt"></i> 开始转换
+                </button>
+
+                <button class="download-btn" id="downloadBtn">
+                    <i class="fas fa-download"></i> 下载转换图片
+                </button>
+
+                <div class="model-previews">
+                    <div class="model-preview" data-model="candy">
+                        <div class="model-icon">🍬</div>
+                        <div>糖果</div>
+                    </div>
+                    <div class="model-preview" data-model="mosaic">
+                        <div class="model-icon">🎨</div>
+                        <div>马赛克</div>
+                    </div>
+                    <div class="model-preview" data-model="starry_night">
+                        <div class="model-icon">✨</div>
+                        <div>星空</div>
+                    </div>
+                    <div class="model-preview" data-model="rain-princess">
+                        <div class="model-icon">👸</div>
+                        <div>雨公主</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-panel">
+                <h2 class="panel-title">预览区域</h2>
+                <div class="image-container">
+                    <div class="image-box">
+                        <div class="image-label">原始图片</div>
+                        <div class="image-placeholder" id="inputPlaceholder">
+                            <div class="image-placeholder-text">
+                                <i class="fas fa-image fa-2x"></i>
+                                <p>请先上传图片</p>
+                            </div>
+                        </div>
+                        <img id="uploaded-image" class="preview-image" style="display: none;">
+                    </div>
+
+                    <div class="image-box">
+                        <div class="image-label">艺术效果</div>
+                        <div class="image-placeholder" id="outputPlaceholder">
+                            <div class="image-placeholder-text">
+                                <i class="fas fa-star fa-2x"></i>
+                                <p>转换后将显示在这里</p>
+                            </div>
+                        </div>
+                        <div id="output">
+                            <div class="loading" id="loading">
+                                <div class="spinner"></div>
+                                <p>正在转换中，请稍候...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 艺术风格转换器 | 让每一张图片都成为艺术品</p>
+        </footer>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const fileInput = document.getElementById('fileInput');
+        const selectBtn = document.getElementById('selectBtn');
+        const dropArea = document.getElementById('dropArea');
+        const inputPlaceholder = document.getElementById('inputPlaceholder');
+        const uploadedImage = document.getElementById('uploaded-image');
+        const outputPlaceholder = document.getElementById('outputPlaceholder');
+        const loading = document.getElementById('loading');
+        const modelSelect = document.getElementById('modelSelect');
+        const predictBtn = document.getElementById('predictBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const modelPreviews = document.querySelectorAll('.model-preview');
+
+        // 存储转换后的图片URL
+        let convertedImageUrl = null;
+
+        // 事件监听器
+        selectBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', handleImageUpload);
+
+        // 拖拽上传功能
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.style.backgroundColor = '#e0e7ff';
+            dropArea.style.borderColor = '#4f46e5';
+        }
+
+        function unhighlight() {
+            dropArea.style.backgroundColor = '#f8f9ff';
+            dropArea.style.borderColor = '#667eea';
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length) {
+                fileInput.files = files;
+                handleImageUpload();
+            }
+        }
+
+        function handleImageUpload() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedImage.src = e.target.result;
+                uploadedImage.style.display = 'block';
+                inputPlaceholder.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // 模型预览点击事件
+        modelPreviews.forEach(preview => {
+            preview.addEventListener('click', () => {
+                const model = preview.dataset.model;
+                modelSelect.value = model;
+
+                // 更新选中状态
+                modelPreviews.forEach(p => p.classList.remove('active'));
+                preview.classList.add('active');
+            });
+        });
+
+        // 初始化第一个预览为选中状态
+        if (modelPreviews.length > 0) {
+            modelPreviews[0].classList.add('active');
+        }
+
+        // 表单提交事件
+        predictBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('请先选择一张图片！');
+                return;
+            }
+
+            // 显示加载状态
+            outputPlaceholder.style.display = 'none';
+            loading.style.display = 'block';
+            downloadBtn.style.display = 'none'; // 隐藏下载按钮
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('model', modelSelect.value);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+
+                if (data.error) {
+                    outputPlaceholder.style.display = 'flex';
+                    alert('转换失败: ' + data.error);
+                    return;
+                }
+
+                const outputImageUrl = '/get_image/' + encodeURIComponent(data.output_image_path.split('/').pop());
+                const outputImage = document.createElement('img');
+                outputImage.src = outputImageUrl;
+                outputImage.className = 'preview-image';
+                outputImage.alt = '转换后的图片';
+                outputImage.id = 'converted-image'; // 添加ID便于引用
+
+                document.getElementById('output').innerHTML = '';
+                document.getElementById('output').appendChild(outputImage);
+
+                // 保存转换后的图片URL
+                convertedImageUrl = outputImageUrl;
+
+                // 显示下载按钮
+                downloadBtn.style.display = 'block';
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                outputPlaceholder.style.display = 'flex';
+                console.error('Error:', error);
+                alert('处理图片时出错，请重试！');
+            });
+        });
+
+        // 下载按钮事件
+        downloadBtn.addEventListener('click', function() {
+            if (!convertedImageUrl) {
+                alert('请先转换图片！');
+                return;
+            }
+
+            // 创建临时链接下载图片
+            const link = document.createElement('a');
+            link.href = convertedImageUrl;
+            link.download = `艺术转换_${modelSelect.value}_${new Date().getTime()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // 模型选择变化时更新预览选中状态
+        modelSelect.addEventListener('change', () => {
+            const selectedModel = modelSelect.value;
+            modelPreviews.forEach(preview => {
+                preview.classList.remove('active');
+                if (preview.dataset.model === selectedModel) {
+                    preview.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

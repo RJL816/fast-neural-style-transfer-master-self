@@ -1,0 +1,9 @@
+pillow
+opencv-python
+tqdm
+torch
+torchvision
+numpy
+onnxruntime
+
+flask

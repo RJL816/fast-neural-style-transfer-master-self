@@ -1,0 +1,2 @@
+训练命令
+python train.py --dataset my_dataset --style-image images/style-images/starry_night.jpg --save-model save_model --epochs 10 --image-size 256 --style-weight 5e9
