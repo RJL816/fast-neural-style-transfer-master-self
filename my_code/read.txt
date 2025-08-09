@@ -1,2 +1,9 @@
 训练命令
 python train.py --dataset my_dataset --style-image images/style-images/starry_night.jpg --save-model save_model --epochs 10 --image-size 256 --style-weight 5e9
+启动服务
+deploy中的app.py是启动服务用的，运行即可，templates中存放的是前端页面
+my_code中orderPhoto是为数据集命名的
+preprocess.py是预处理数据集中的图片的
+videoTransform.py是将视频抽帧变成图片的
+使用该项目时需要创建my_dataset文件夹，分为images和images_raw
+根目录下的images文件夹中的style-images可以存档你想训练的不同风格的图片，需要预先处理使用preprocess.py
